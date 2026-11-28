@@ -69,6 +69,12 @@ interface LeafContext {
   encodingLayer: 'raw' | 'nested-json'
 }
 
+function generateSessionSalt(): string {
+  const bytes = new Uint8Array(16)
+  globalThis.crypto.getRandomValues(bytes)
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')
+}
+
 export function createPolicy(overrides: Partial<PolicyConfig> = {}): PolicyConfig {
   const preset = overrides.preset ?? 'balanced'
 
@@ -106,7 +112,7 @@ export function createPolicy(overrides: Partial<PolicyConfig> = {}): PolicyConfi
   return {
     preset,
     style: overrides.style ?? 'hmac-tag',
-    sessionSalt: overrides.sessionSalt ?? 'sessionveil-local-v1',
+    sessionSalt: overrides.sessionSalt ?? generateSessionSalt(),
     enableSecondPassPropagation: overrides.enableSecondPassPropagation ?? true,
     nestedJsonMaxDepth: overrides.nestedJsonMaxDepth ?? 4,
     categories: {

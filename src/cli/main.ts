@@ -30,6 +30,8 @@ interface ParsedCliArgs {
   flags: Record<string, string | boolean>
 }
 
+const BOOLEAN_FLAGS = new Set(['stdout', 'no-propagate', 'help', 'version'])
+
 function parseArgs(argv: string[]): ParsedCliArgs {
   const positionals: string[] = []
   const flags: Record<string, string | boolean> = {}
@@ -61,6 +63,10 @@ function parseArgs(argv: string[]): ParsedCliArgs {
     }
     if (arg.startsWith('--')) {
       const key = arg.slice(2)
+      if (BOOLEAN_FLAGS.has(key)) {
+        flags[key] = true
+        continue
+      }
       const next = argv[i + 1]
       if (next && !next.startsWith('-')) {
         flags[key] = next
@@ -146,7 +152,7 @@ function buildPolicyFromFlags(flags: Record<string, string | boolean>): PolicyCo
   return createPolicy({
     preset: presetRaw,
     style: styleRaw as RedactionStyle,
-    sessionSalt: typeof flags.salt === 'string' ? flags.salt : 'sessionveil-local-v1',
+    sessionSalt: typeof flags.salt === 'string' ? flags.salt : undefined,
     enableSecondPassPropagation: flags['no-propagate'] ? false : true,
     allowlistPatterns,
     seedSecrets,

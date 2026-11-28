@@ -418,7 +418,7 @@ export const BUILTIN_RULES: RuleDefinition[] = [
     propagateToProse: true,
     findMatches(text: string): RawRuleMatch[] {
       // Matches standard env vars, .NET hierarchical `Service__AuthToken=...`, YAML/JSON/CLI `--password=...`
-      const re = /(?:^|[\s"'`,;({\[])([A-Za-z0-9_.-]*(?:__(?:AuthToken|ApiKey|Secret|Password|ClientSecret|ConnectionString|AccessKey)|(?:API[_-]?KEY|AUTH[_-]?TOKEN|ACCESS[_-]?TOKEN|REFRESH[_-]?TOKEN|CLIENT[_-]?SECRET|AWS[_-]?SECRET[_-]?ACCESS[_-]?KEY|PRIVATE[_-]?KEY|SIGNING[_-]?SECRET|WEBHOOK[_-]?SECRET|DB[_-]?PASSWORD|POSTGRES[_-]?PASSWORD|MYSQL[_-]?PASSWORD|REDIS[_-]?PASSWORD|SQL[_-]?PASSWORD|ADMIN[_-]?PASSWORD|MASTER[_-]?PASSWORD|TWILIO[_-]?AUTH[_-]?TOKEN|PASS(?:WORD|WD)))[A-Za-z0-9_]*)\s*(?:=|:)\s*(['"]?)([^\s'"`,;)}\]\r\n]{6,256})\2/gi
+      const re = /(?:^|[\s"'`,;({\[])([A-Za-z0-9_.-]*(?:__(?:AuthToken|ApiKey|Secret|Password|ClientSecret|ConnectionString|AccessKey)|(?:API[_-]?KEY|AUTH[_-]?TOKEN|ACCESS[_-]?TOKEN|REFRESH[_-]?TOKEN|CLIENT[_-]?SECRET|AWS[_-]?SECRET[_-]?ACCESS[_-]?KEY|PRIVATE[_-]?KEY|SIGNING[_-]?SECRET|WEBHOOK[_-]?SECRET|DB[_-]?PASSWORD|POSTGRES[_-]?PASSWORD|MYSQL[_-]?PASSWORD|REDIS[_-]?PASSWORD|SQL[_-]?PASSWORD|ADMIN[_-]?PASSWORD|MASTER[_-]?PASSWORD|TWILIO[_-]?AUTH[_-]?TOKEN|PASS(?:WORD|WD)))[A-Za-z0-9_]*)\s*(?:=|:)\s*(['"]?)([^\s'"`,;)}\]\\\r\n]{6,256})\2/gi
       const out: RawRuleMatch[] = []
       let m: RegExpExecArray | null
       while ((m = re.exec(text)) !== null) {
