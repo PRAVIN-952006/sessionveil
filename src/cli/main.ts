@@ -49,6 +49,16 @@ function parseArgs(argv: string[]): ParsedCliArgs {
 
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i]
+    if (arg === '--') {
+      const rest = argv.slice(i + 1)
+      if (!command && rest.length > 0) {
+        command = rest[0]
+        positionals.push(...rest.slice(1))
+      } else {
+        positionals.push(...rest)
+      }
+      break
+    }
     if (!arg.startsWith('-')) {
       if (!command) command = arg
       else positionals.push(arg)
@@ -93,7 +103,8 @@ function parseArgs(argv: string[]): ParsedCliArgs {
         throw new Error(`Unknown flag: --${key}`)
       }
       const next = argv[i + 1]
-      if (!next || next.startsWith('-')) {
+      const allowDashValue = key === 'salt' || key === 'allowlist'
+      if (!next || (!allowDashValue && next.startsWith('-'))) {
         throw new Error(`Missing value after --${key}.`)
       }
       flags[key] = next

@@ -61,6 +61,11 @@ test('CLI scan, scrub, and verify commands enforce exit codes and produce verifi
       runCli(['scan', allowlistTarget, '--fail-on', 'high', '--allowlist', allowlistPattern]),
       0,
     )
+
+    // 7. -- end-of-options and leading-dash --salt values are handled cleanly
+    const dashTarget = path.join(tmpDir, '-leading.txt')
+    fs.writeFileSync(dashTarget, 'hello world\n', 'utf8')
+    assert.equal(runCli(['scan', '--salt', '-custom-salt', '--', dashTarget]), 0)
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true })
   }
