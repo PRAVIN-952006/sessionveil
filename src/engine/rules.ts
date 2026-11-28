@@ -112,7 +112,9 @@ function regexTokenRule(opts: {
     propagateToProse: propagate,
     findMatches(text: string): RawRuleMatch[] {
       const results: RawRuleMatch[] = []
-      const flags = opts.pattern.flags.includes('g') ? opts.pattern.flags : `${opts.pattern.flags}g`
+      let flags = opts.pattern.flags
+      if (!flags.includes('g')) flags += 'g'
+      if (!flags.includes('d')) flags += 'd'
       const re = new RegExp(opts.pattern.source, flags)
       let m: RegExpExecArray | null
 
@@ -121,7 +123,13 @@ function regexTokenRule(opts: {
         const target = m[groupIdx]
         if (!target || isPlaceholderValue(target)) continue
 
-        const relOffset = groupIdx === 0 ? 0 : full.indexOf(target)
+        const groupStart = m.indices?.[groupIdx]?.[0]
+        const relOffset =
+          groupIdx === 0
+            ? 0
+            : groupStart !== undefined
+              ? groupStart - m.index
+              : full.lastIndexOf(target)
         if (relOffset < 0) continue
 
         const secretStart = m.index + relOffset
@@ -447,7 +455,7 @@ export const BUILTIN_RULES: RuleDefinition[] = [
           secretEnd,
           secretValue: secret,
           tagLabel: 'ENV_SECRET',
-          propagateToProse: secret.length >= 8,
+          propagateToProse: secret.length >= 6,
         })
       }
       return out
@@ -632,6 +640,6 @@ export function detectContextKeySecret(value: string, jsonPath?: string): RawRul
     secretEnd: start + trimmed.length,
     secretValue: trimmed,
     tagLabel: 'FIELD_SECRET',
-    propagateToProse: trimmed.length >= 8,
+    propagateToProse: trimmed.length >= 6,
   }
 }

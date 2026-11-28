@@ -31,6 +31,16 @@ interface ParsedCliArgs {
 }
 
 const BOOLEAN_FLAGS = new Set(['stdout', 'no-propagate', 'help', 'version'])
+const VALUE_FLAGS = new Set([
+  'output',
+  'policy',
+  'style',
+  'salt',
+  'env-file',
+  'allowlist',
+  'format',
+  'fail-on',
+])
 
 function parseArgs(argv: string[]): ParsedCliArgs {
   const positionals: string[] = []
@@ -62,7 +72,15 @@ function parseArgs(argv: string[]): ParsedCliArgs {
     }
     const eqIdx = arg.indexOf('=')
     if (arg.startsWith('--') && eqIdx !== -1) {
-      flags[arg.slice(2, eqIdx)] = arg.slice(eqIdx + 1)
+      const key = arg.slice(2, eqIdx)
+      if (!VALUE_FLAGS.has(key)) {
+        throw new Error(`Unknown or non-value flag: --${key}`)
+      }
+      const val = arg.slice(eqIdx + 1)
+      if (!val) {
+        throw new Error(`Missing value after --${key}=.`)
+      }
+      flags[key] = val
       continue
     }
     if (arg.startsWith('--')) {
@@ -71,14 +89,18 @@ function parseArgs(argv: string[]): ParsedCliArgs {
         flags[key] = true
         continue
       }
-      const next = argv[i + 1]
-      if (next && !next.startsWith('-')) {
-        flags[key] = next
-        i += 1
-      } else {
-        flags[key] = true
+      if (!VALUE_FLAGS.has(key)) {
+        throw new Error(`Unknown flag: --${key}`)
       }
+      const next = argv[i + 1]
+      if (!next || next.startsWith('-')) {
+        throw new Error(`Missing value after --${key}.`)
+      }
+      flags[key] = next
+      i += 1
+      continue
     }
+    throw new Error(`Unknown flag: ${arg}`)
   }
 
   return { command, positionals, flags }

@@ -350,7 +350,7 @@ export function sanitizeTranscript(
         if (m.canonicalSecret.length >= 6) {
           allDiscoveredSecrets.add(m.canonicalSecret)
         }
-        if (m.propagateToProse && m.canonicalSecret.length >= 8) {
+        if (m.propagateToProse && m.canonicalSecret.length >= 6) {
           registerVaultSecret({
             secretValue: m.canonicalSecret,
             ruleId: m.ruleId,
