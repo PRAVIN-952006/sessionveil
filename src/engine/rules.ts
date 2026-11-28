@@ -123,7 +123,8 @@ function regexTokenRule(opts: {
         const target = m[groupIdx]
         if (!target || isPlaceholderValue(target)) continue
 
-        const groupStart = m.indices?.[groupIdx]?.[0]
+        const indices = (m as RegExpExecArray & { indices?: Array<[number, number] | undefined> }).indices
+        const groupStart = indices?.[groupIdx]?.[0]
         const relOffset =
           groupIdx === 0
             ? 0
