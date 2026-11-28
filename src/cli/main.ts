@@ -53,7 +53,11 @@ function parseArgs(argv: string[]): ParsedCliArgs {
       continue
     }
     if (arg === '-o' || arg === '--output') {
-      flags.output = argv[++i] ?? ''
+      const next = argv[++i]
+      if (!next || next.startsWith('-')) {
+        throw new Error(`Missing output path after ${arg}.`)
+      }
+      flags.output = next
       continue
     }
     const eqIdx = arg.indexOf('=')

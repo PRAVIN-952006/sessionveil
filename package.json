@@ -5,6 +5,9 @@
   "description": "Structure-preserving AI coding-agent transcript and MCP trace sanitizer with two-pass correlated redaction",
   "license": "MIT",
   "type": "module",
+  "engines": {
+    "node": ">=22.6.0"
+  },
   "bin": {
     "sessionveil": "./build/cli/main.js"
   },
